@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Warehouse · Adrit Singh</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/warehouse.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body class="warehouse-page">
+
+  <div class="preloader" id="preloader" aria-hidden="true">
+    <div class="preloader-card">
+      <div class="preloader-mark">AS</div>
+      <div class="preloader-bar"><span></span></div>
+      <p>Loading warehouse...</p>
+    </div>
+  </div>
+  <div class="scroll-progress"><span id="scrollProgress"></span></div>
+
+  <!-- ░░ CURSOR ░░ -->
+  <div class="cursor"></div>
+  <div class="cursor-follower"></div>
+
+  <!-- ░░ NAVBAR ░░ -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-logo">
+      <a href="index.html"><span class="logo-text">ADRIT <span class="accent">SINGH</span></span></a>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html#home" class="nav-link">Home</a></li>
+      <li><a href="index.html#about" class="nav-link">About</a></li>
+      <li><a href="index.html#projects" class="nav-link">Projects</a></li>
+      <li><a href="index.html#skills" class="nav-link">Skills</a></li>
+      <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+      <li><a href="warehouse.html" class="nav-link nav-warehouse active"><i class="fa-solid fa-warehouse"></i> Warehouse</a></li>
+    </ul>
+    <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+  </nav>
+
+  <!-- ░░ WAREHOUSE HERO ░░ -->
+  <section class="wh-hero">
+    <div class="wh-hero-bg">
+      <div class="wh-grid-lines"></div>
+      <div class="floating-icons">
+        <i class="fa-solid fa-file-pdf fi fi-1"></i>
+        <i class="fa-solid fa-file-powerpoint fi fi-2"></i>
+        <i class="fa-solid fa-file-audio fi fi-3"></i>
+        <i class="fa-solid fa-file-video fi fi-4"></i>
+        <i class="fa-solid fa-file-zipper fi fi-5"></i>
+        <i class="fa-solid fa-file-image fi fi-6"></i>
+        <i class="fa-solid fa-file-code fi fi-7"></i>
+        <i class="fa-solid fa-folder fi fi-8"></i>
+      </div>
+    </div>
+    <div class="wh-hero-content">
+      <div class="wh-badge"><i class="fa-solid fa-warehouse"></i> Storage Hub</div>
+      <h1 class="wh-title">My <span class="accent">Warehouse</span></h1>
+      <p class="wh-subtitle">All my files, organized beautifully. PDFs, presentations, media, and more — all in one place.</p>
+      <div class="wh-stats">
+        <div class="wh-stat"><span class="wh-stat-num" id="statFiles">0</span><span class="wh-stat-label">Files</span></div>
+        <div class="wh-stat"><span class="wh-stat-num" id="statCategories">0</span><span class="wh-stat-label">Categories</span></div>
+        <div class="wh-stat"><span class="wh-stat-num" id="statSize">0 MB</span><span class="wh-stat-label">Total Size</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ TOOLBAR ░░ -->
+  <div class="wh-toolbar">
+    <div class="container">
+      <div class="wh-search-wrap">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" placeholder="Search files..." class="wh-search"/>
+        <button class="search-clear" id="searchClear"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="wh-filters" id="filterBtns">
+        <button class="filter-btn active" data-filter="all"><i class="fa-solid fa-border-all"></i> All</button>
+        <button class="filter-btn" data-filter="pdf"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+        <button class="filter-btn" data-filter="pptx"><i class="fa-solid fa-file-powerpoint"></i> PPTX</button>
+        <button class="filter-btn" data-filter="audio"><i class="fa-solid fa-file-audio"></i> Audio</button>
+        <button class="filter-btn" data-filter="video"><i class="fa-solid fa-file-video"></i> Video</button>
+        <button class="filter-btn" data-filter="image"><i class="fa-solid fa-file-image"></i> Image</button>
+        <button class="filter-btn" data-filter="other"><i class="fa-solid fa-file-zipper"></i> Other</button>
+      </div>
+      <div class="wh-sort">
+        <label class="sort-label" for="sortSelect"><i class="fa-solid fa-sort"></i></label>
+        <select id="sortSelect" class="sort-select">
+          <option value="recent">Recent</option>
+          <option value="name">Name</option>
+          <option value="size">Size</option>
+        </select>
+      </div>
+      <div class="wh-view-toggle">
+        <button class="view-btn active" id="gridView"><i class="fa-solid fa-grid-2"></i></button>
+        <button class="view-btn" id="listView"><i class="fa-solid fa-list"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ░░ UPLOAD ZONE ░░ -->
+  <div class="container">
+    <div class="upload-zone" id="uploadZone">
+      <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+      <p class="upload-text">Drop files here or <span class="upload-link">browse</span></p>
+      <p class="upload-sub">Supports PDF, PPTX, MP3, MP4, PNG, JPG, ZIP and more</p>
+      <input type="file" id="fileInput" multiple hidden/>
+    </div>
+  </div>
+
+  <!-- ░░ FILES GRID ░░ -->
+  <main class="wh-main container" id="warehouseMain">
+    <div class="files-grid" id="filesGrid">
+      <!-- Files injected by warehouse.js -->
+    </div>
+    <div class="empty-state" id="emptyState" style="display:none">
+      <i class="fa-solid fa-box-open"></i>
+      <h3>No files found</h3>
+      <p>Try a different search or filter.</p>
+    </div>
+  </main>
+
+  <!-- ░░ FILE PREVIEW MODAL ░░ -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="file-modal" id="fileModal">
+      <button class="modal-close" id="modalClose"><i class="fa-solid fa-xmark"></i></button>
+      <div class="modal-icon" id="modalIcon"></div>
+      <div class="modal-info">
+        <h3 id="modalName"></h3>
+        <div class="modal-meta">
+          <span id="modalType"></span>
+          <span id="modalSize"></span>
+          <span id="modalDate"></span>
+        </div>
+        <p id="modalDesc"></p>
+      </div>
+      <div class="modal-actions">
+        <a href="#" class="btn btn-primary" id="modalDownload" download><i class="fa-solid fa-download"></i> Download</a>
+        <a href="#" class="btn btn-secondary" id="modalView" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> View</a>
+        <button class="btn btn-secondary" id="modalCopyLink"><i class="fa-solid fa-link"></i> Copy Link</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ░░ TOAST ░░ -->
+  <div class="toast" id="toast">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="toastMsg"></span>
+  </div>
+
+  <!-- ░░ FOOTER ░░ -->
+  <footer class="footer">
+    <p>Designed & Built by <span class="accent">Adrit Singh</span></p>
+    <p class="footer-copy">© 2026 All rights reserved.</p>
+  </footer>
+
+  <button class="back-to-top" id="backToTop" aria-label="Back to top"><i class="fa-solid fa-arrow-up"></i></button>
+
+  <script src="js/main.js"></script>
+  <script src="js/warehouse.js"></script>
+</body>
+</html>
