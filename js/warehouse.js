@@ -38,7 +38,8 @@
     audio: 'Audio Files',
     video: 'Video Files',
     image: 'Images & Design',
-    other: 'Archives & Other'
+    other: 'Archives & Other',
+
   };
 
   const FILES = [
@@ -71,13 +72,13 @@
     },
     {
       id: 19,
-      name: 'Chemistry.pdf',
-      type: 'pdf',
+      name: 'Chemistry.web',
+      type: 'other',
       size: '4.8 MB',
       date: 'Jun 22, 2026',
       desc: 'A chemistry comic on atomic structure and classroom storytelling.',
       color: '#ef4444',
-      url: 'assets/files/Chemistry.pdf'
+      url: 'assets/files/chemistry.html'
     },
     {
       id: 20,
@@ -89,6 +90,17 @@
       color: '#ef4444',
       url: 'assets/files/physicsss.pdf'
     },
+{
+      id: 21,
+      name: 'APE_Presentation.pdf',
+      type: 'pdf',
+      size: '6.1 MB',
+      date: 'Jun 22, 2026',
+      desc: 'English PPT.',
+      color: '#ef4444',
+      url: 'assets/files/APE_Presentation.pdf'
+    },
+
     {
       id: 4,
       name: 'Product Pitch Deck.pptx',
@@ -136,7 +148,7 @@
     },
     {
       id: 9,
-      name: 'Demo Reel 2026.mp4',
+      name: ' Reel 2026.mp4',
       type: 'video',
       size: '215 MB',
       date: 'Jun 20, 2026',
@@ -145,7 +157,7 @@
     },
     {
       id: 10,
-      name: 'Tutorial - React Hooks.mp4',
+      name: 'React Hooks.mp4',
       type: 'video',
       size: '180 MB',
       date: 'Jun 10, 2026',
@@ -154,7 +166,7 @@
     },
     {
       id: 11,
-      name: 'Client Testimonial.mov',
+      name: 'Client Edit.mov',
       type: 'video',
       size: '95 MB',
       date: 'Jun 05, 2026',
