@@ -4,48 +4,59 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Warehouse · Adrit Singh</title>
+  <meta name="description" content="Adrit Singh's Warehouse — school work, presentations and files, searchable and filterable."/>
+  <meta name="theme-color" content="#0b0613"/>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b0613'/%3E%3Ctext x='32' y='43' font-family='Arial' font-weight='800' font-size='30' text-anchor='middle' fill='%23e879d9'%3EAS%3C/text%3E%3C/svg%3E"/>
+  <script>
+    document.documentElement.classList.add('js');
+    try { if (sessionStorage.getItem('as-visited')) document.documentElement.classList.add('skip-preload'); } catch (e) {}
+  </script>
+  <noscript><style>.preloader{display:none}</style></noscript>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <link rel="stylesheet" href="css/style.css"/>
   <link rel="stylesheet" href="css/warehouse.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 </head>
 <body class="warehouse-page">
 
   <div class="preloader" id="preloader" aria-hidden="true">
-    <div class="preloader-card">
-      <div class="preloader-mark">AS</div>
-      <div class="preloader-bar"><span></span></div>
-      <p>Loading warehouse...</p>
+    <div class="pl-inner">
+      <div class="pl-mark"><span>A</span><span>S</span></div>
+      <div class="pl-line"><span id="plBar"></span></div>
+      <p class="pl-count"><span id="plNum">0</span>%</p>
     </div>
   </div>
-  <div class="scroll-progress"><span id="scrollProgress"></span></div>
+  <div class="scroll-progress" aria-hidden="true"><span id="scrollProgress"></span></div>
 
-  <!-- ░░ CURSOR ░░ -->
-  <div class="cursor"></div>
-  <div class="cursor-follower"></div>
+  <div class="cursor" aria-hidden="true"></div>
+  <div class="cursor-follower" aria-hidden="true"></div>
 
-  <!-- ░░ NAVBAR ░░ -->
-  <nav class="navbar" id="navbar">
-    <div class="nav-logo">
-      <a href="index.html"><span class="logo-text">ADRIT <span class="accent">SINGH</span></span></a>
-    </div>
-    <ul class="nav-links">
-      <li><a href="index.html#home" class="nav-link">Home</a></li>
-      <li><a href="index.html#about" class="nav-link">About</a></li>
-      <li><a href="index.html#projects" class="nav-link">Projects</a></li>
-      <li><a href="index.html#skills" class="nav-link">Skills</a></li>
-      <li><a href="index.html#contact" class="nav-link">Contact</a></li>
-      <li><a href="warehouse.html" class="nav-link nav-warehouse active"><i class="fa-solid fa-warehouse"></i> Warehouse</a></li>
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar" aria-label="Main">
+    <a class="nav-logo" href="index.html" aria-label="Adrit Singh — home">
+      <span class="logo-text">ADRIT <span class="accent">SINGH</span></span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li style="--i:0"><a href="index.html#home" class="nav-link">Home</a></li>
+      <li style="--i:1"><a href="index.html#about" class="nav-link">About</a></li>
+      <li style="--i:2"><a href="index.html#projects" class="nav-link">Projects</a></li>
+      <li style="--i:3"><a href="index.html#skills" class="nav-link">Skills</a></li>
+      <li style="--i:4"><a href="index.html#contact" class="nav-link">Contact</a></li>
+      <li style="--i:5"><a href="warehouse.html" class="nav-link nav-warehouse active" aria-current="page"><i class="fa-solid fa-warehouse" aria-hidden="true"></i> Warehouse</a></li>
     </ul>
-    <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+    <button class="hamburger" id="hamburger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
+      <span></span><span></span><span></span>
+    </button>
   </nav>
 
-  <!-- ░░ WAREHOUSE HERO ░░ -->
+  <!-- WAREHOUSE HERO -->
   <section class="wh-hero">
-    <div class="wh-hero-bg">
+    <div class="wh-hero-bg" aria-hidden="true">
       <div class="wh-grid-lines"></div>
+      <div class="wh-orb wh-orb-1"></div>
+      <div class="wh-orb wh-orb-2"></div>
       <div class="floating-icons">
         <i class="fa-solid fa-file-pdf fi fi-1"></i>
         <i class="fa-solid fa-file-powerpoint fi fi-2"></i>
@@ -57,11 +68,11 @@
         <i class="fa-solid fa-folder fi fi-8"></i>
       </div>
     </div>
-    <div class="wh-hero-content">
-      <div class="wh-badge"><i class="fa-solid fa-warehouse"></i> Storage Hub</div>
-      <h1 class="wh-title">My <span class="accent">Warehouse</span></h1>
-      <p class="wh-subtitle">All my files, organized beautifully. PDFs, presentations, media, and more — all in one place.</p>
-      <div class="wh-stats">
+    <div class="wh-hero-content" data-stagger>
+      <div class="wh-badge" data-reveal><i class="fa-solid fa-warehouse" aria-hidden="true"></i> Storage Hub</div>
+      <h1 class="wh-title" data-reveal>My <em>Warehouse</em></h1>
+      <p class="wh-subtitle" data-reveal>All my files, organized beautifully. PDFs, presentations, media, and more — all in one place.</p>
+      <div class="wh-stats" data-reveal>
         <div class="wh-stat"><span class="wh-stat-num" id="statFiles">0</span><span class="wh-stat-label">Files</span></div>
         <div class="wh-stat"><span class="wh-stat-num" id="statCategories">0</span><span class="wh-stat-label">Categories</span></div>
         <div class="wh-stat"><span class="wh-stat-num" id="statSize">0 MB</span><span class="wh-stat-label">Total Size</span></div>
@@ -69,64 +80,63 @@
     </div>
   </section>
 
-  <!-- ░░ TOOLBAR ░░ -->
-  <div class="wh-toolbar">
+  <!-- TOOLBAR -->
+  <div class="wh-toolbar" role="search">
     <div class="container">
       <div class="wh-search-wrap">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" id="searchInput" placeholder="Search files..." class="wh-search"/>
-        <button class="search-clear" id="searchClear"><i class="fa-solid fa-xmark"></i></button>
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        <label class="sr-only" for="searchInput">Search files</label>
+        <input type="search" id="searchInput" placeholder="Search files..." class="wh-search" autocomplete="off"/>
+        <button class="search-clear" id="searchClear" type="button" aria-label="Clear search"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
       </div>
-      <div class="wh-filters" id="filterBtns">
-        <button class="filter-btn active" data-filter="all"><i class="fa-solid fa-border-all"></i> All</button>
-        <button class="filter-btn" data-filter="pdf"><i class="fa-solid fa-file-pdf"></i> PDF</button>
-        <button class="filter-btn" data-filter="pptx"><i class="fa-solid fa-file-powerpoint"></i> PPTX</button>
-        <button class="filter-btn" data-filter="audio"><i class="fa-solid fa-file-audio"></i> Audio</button>
-        <button class="filter-btn" data-filter="video"><i class="fa-solid fa-file-video"></i> Video</button>
-        <button class="filter-btn" data-filter="image"><i class="fa-solid fa-file-image"></i> Image</button>
-        <button class="filter-btn" data-filter="other"><i class="fa-solid fa-file-zipper"></i> Other</button>
+      <div class="wh-filters" id="filterBtns" role="group" aria-label="Filter by type">
+        <button class="filter-btn active" data-filter="all" type="button" aria-pressed="true"><i class="fa-solid fa-border-all" aria-hidden="true"></i> All</button>
+        <button class="filter-btn" data-filter="pdf" type="button" aria-pressed="false"><i class="fa-solid fa-file-pdf" aria-hidden="true"></i> PDF</button>
+        <button class="filter-btn" data-filter="pptx" type="button" aria-pressed="false"><i class="fa-solid fa-file-powerpoint" aria-hidden="true"></i> PPTX</button>
+        <button class="filter-btn" data-filter="audio" type="button" aria-pressed="false"><i class="fa-solid fa-file-audio" aria-hidden="true"></i> Audio</button>
+        <button class="filter-btn" data-filter="video" type="button" aria-pressed="false"><i class="fa-solid fa-file-video" aria-hidden="true"></i> Video</button>
+        <button class="filter-btn" data-filter="image" type="button" aria-pressed="false"><i class="fa-solid fa-file-image" aria-hidden="true"></i> Image</button>
+        <button class="filter-btn" data-filter="other" type="button" aria-pressed="false"><i class="fa-solid fa-file-zipper" aria-hidden="true"></i> Other</button>
       </div>
       <div class="wh-sort">
-        <label class="sort-label" for="sortSelect"><i class="fa-solid fa-sort"></i></label>
+        <label class="sort-label" for="sortSelect"><i class="fa-solid fa-arrow-down-wide-short" aria-hidden="true"></i><span class="sr-only">Sort by</span></label>
         <select id="sortSelect" class="sort-select">
           <option value="recent">Recent</option>
           <option value="name">Name</option>
           <option value="size">Size</option>
         </select>
       </div>
-      <div class="wh-view-toggle">
-        <button class="view-btn active" id="gridView"><i class="fa-solid fa-grid-2"></i></button>
-        <button class="view-btn" id="listView"><i class="fa-solid fa-list"></i></button>
+      <div class="wh-view-toggle" role="group" aria-label="View mode">
+        <button class="view-btn active" id="gridView" type="button" aria-label="Grid view" aria-pressed="true"><i class="fa-solid fa-table-cells-large" aria-hidden="true"></i></button>
+        <button class="view-btn" id="listView" type="button" aria-label="List view" aria-pressed="false"><i class="fa-solid fa-list" aria-hidden="true"></i></button>
       </div>
     </div>
   </div>
 
-  <!-- ░░ UPLOAD ZONE ░░ -->
+  <!-- UPLOAD ZONE -->
   <div class="container">
-    <div class="upload-zone" id="uploadZone">
-      <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+    <div class="upload-zone" id="uploadZone" role="button" tabindex="0" aria-label="Add files: drop here or press Enter to browse">
+      <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i></div>
       <p class="upload-text">Drop files here or <span class="upload-link">browse</span></p>
       <p class="upload-sub">Supports PDF, PPTX, MP3, MP4, PNG, JPG, ZIP and more</p>
       <input type="file" id="fileInput" multiple hidden/>
     </div>
   </div>
 
-  <!-- ░░ FILES GRID ░░ -->
+  <!-- FILES GRID -->
   <main class="wh-main container" id="warehouseMain">
-    <div class="files-grid" id="filesGrid">
-      <!-- Files injected by warehouse.js -->
-    </div>
+    <div class="files-grid" id="filesGrid"></div>
     <div class="empty-state" id="emptyState" style="display:none">
-      <i class="fa-solid fa-box-open"></i>
-      <h3>No files found</h3>
+      <i class="fa-solid fa-box-open" aria-hidden="true"></i>
+      <h2>No files found</h2>
       <p>Try a different search or filter.</p>
     </div>
   </main>
 
-  <!-- ░░ FILE PREVIEW MODAL ░░ -->
-  <div class="modal-overlay" id="modalOverlay">
-    <div class="file-modal" id="fileModal">
-      <button class="modal-close" id="modalClose"><i class="fa-solid fa-xmark"></i></button>
+  <!-- FILE PREVIEW MODAL -->
+  <div class="modal-overlay" id="modalOverlay" aria-hidden="true">
+    <div class="file-modal" id="fileModal" role="dialog" aria-modal="true" aria-labelledby="modalName">
+      <button class="modal-close" id="modalClose" type="button" aria-label="Close"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
       <div class="modal-icon" id="modalIcon"></div>
       <div class="modal-info">
         <h3 id="modalName"></h3>
@@ -138,26 +148,24 @@
         <p id="modalDesc"></p>
       </div>
       <div class="modal-actions">
-        <a href="#" class="btn btn-primary" id="modalDownload" download><i class="fa-solid fa-download"></i> Download</a>
-        <a href="#" class="btn btn-secondary" id="modalView" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> View</a>
-        <button class="btn btn-secondary" id="modalCopyLink"><i class="fa-solid fa-link"></i> Copy Link</button>
+        <a href="#" class="btn btn-primary" id="modalDownload" download><i class="fa-solid fa-download" aria-hidden="true"></i> Download</a>
+        <a href="#" class="btn btn-secondary" id="modalView" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> View</a>
+        <button class="btn btn-secondary" id="modalCopyLink" type="button"><i class="fa-solid fa-link" aria-hidden="true"></i> Copy Link</button>
       </div>
     </div>
   </div>
 
-  <!-- ░░ TOAST ░░ -->
-  <div class="toast" id="toast">
-    <i class="fa-solid fa-circle-check"></i>
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
     <span id="toastMsg"></span>
   </div>
 
-  <!-- ░░ FOOTER ░░ -->
   <footer class="footer">
-    <p>Designed & Built by <span class="accent">Adrit Singh</span></p>
+    <p>Designed &amp; Built by <span class="accent">Adrit Singh</span> · <a href="index.html">Back to portfolio</a></p>
     <p class="footer-copy">© 2026 All rights reserved.</p>
   </footer>
 
-  <button class="back-to-top" id="backToTop" aria-label="Back to top"><i class="fa-solid fa-arrow-up"></i></button>
+  <button class="back-to-top" id="backToTop" type="button" aria-label="Back to top"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
 
   <script src="js/main.js"></script>
   <script src="js/warehouse.js"></script>

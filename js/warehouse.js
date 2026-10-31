@@ -1,46 +1,15 @@
 (() => {
   "use strict";
 
+  /* Shared behaviour (cursor, nav, scroll UI, preloader, tilt/spotlight, ripple) lives in main.js.
+     This file only handles the Warehouse data, filtering, modal and uploads. */
+
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const isTouchDevice =
-    window.matchMedia('(hover: none), (pointer: coarse)').matches || 'ontouchstart' in window;
 
-  const TYPE_ICON = {
-    pdf: 'fa-file-pdf',
-    pptx: 'fa-file-powerpoint',
-    audio: 'fa-file-audio',
-    video: 'fa-file-video',
-    image: 'fa-file-image',
-    other: 'fa-file-zipper'
-  };
-
-  const TYPE_CLASS = {
-    pdf: 'type-pdf',
-    pptx: 'type-pptx',
-    audio: 'type-audio',
-    video: 'type-video',
-    image: 'type-image',
-    other: 'type-other'
-  };
-
-  const TYPE_LABEL = {
-    pdf: 'PDF',
-    pptx: 'PPTX',
-    audio: 'Audio',
-    video: 'Video',
-    image: 'Image',
-    other: 'File'
-  };
-
-  const CATEGORY_TITLE = {
-    pdf: 'PDF Documents',
-    pptx: 'Presentations',
-    audio: 'Audio Files',
-    video: 'Video Files',
-    image: 'Images & Design',
-    other: 'Archives & Other',
-
-  };
+  const TYPE_ICON = { pdf: 'fa-file-pdf', pptx: 'fa-file-powerpoint', audio: 'fa-file-audio', video: 'fa-file-video', image: 'fa-file-image', other: 'fa-file-zipper' };
+  const TYPE_CLASS = { pdf: 'type-pdf', pptx: 'type-pptx', audio: 'type-audio', video: 'type-video', image: 'type-image', other: 'type-other' };
+  const TYPE_LABEL = { pdf: 'PDF', pptx: 'PPTX', audio: 'Audio', video: 'Video', image: 'Image', other: 'File' };
+  const CATEGORY_TITLE = { pdf: 'PDF Documents', pptx: 'Presentations', audio: 'Audio Files', video: 'Video Files', image: 'Images & Design', other: 'Archives & Other' };
 
   const FILES = [
     {
@@ -74,7 +43,7 @@
       id: 19,
       name: 'Chemistry.web',
       type: 'other',
-      size: '4.8 MB',
+      size: '0.1 MB',
       date: 'Jun 22, 2026',
       desc: 'A chemistry comic on atomic structure and classroom storytelling.',
       color: '#ef4444',
@@ -84,7 +53,7 @@
       id: 20,
       name: 'Units-Dimensions-Significant-Figures.pdf',
       type: 'pdf',
-      size: '6.1 MB',
+      size: '0.8 MB',
       date: 'Jun 22, 2026',
       desc: 'Physics presentation on units, dimensions, and significant figures by Adrit Singh.',
       color: '#ef4444',
@@ -94,7 +63,7 @@
       id: 21,
       name: 'APE_Presentation.pdf',
       type: 'pdf',
-      size: '6.1 MB',
+      size: '0.7 MB',
       date: 'Jun 22, 2026',
       desc: 'English PPT.',
       color: '#ef4444',
@@ -240,122 +209,80 @@
 
   let activeFilter = 'all';
   let sortMode = 'recent';
-  let viewMode = 'grid';
   let searchTerm = '';
-  let uploadedFiles = [];
-  let favorites = new Set(JSON.parse(localStorage.getItem('warehouseFavorites') || '[]'));
+  const uploadedFiles = [];
+  let lastFocus = null;
 
-  const searchInput = document.getElementById('searchInput');
-  const searchClear = document.getElementById('searchClear');
-  const grid = document.getElementById('filesGrid');
-  const empty = document.getElementById('emptyState');
-  const modalOverlay = document.getElementById('modalOverlay');
-  const modalClose = document.getElementById('modalClose');
-  const modalDownload = document.getElementById('modalDownload');
-  const modalView = document.getElementById('modalView');
-  const modalCopyLink = document.getElementById('modalCopyLink');
-  const navbar = document.getElementById('navbar');
-  const scrollProgress = document.getElementById('scrollProgress');
-  const backToTop = document.getElementById('backToTop');
-  const preloader = document.getElementById('preloader');
-  const uploadZone = document.getElementById('uploadZone');
-  const fileInput = document.getElementById('fileInput');
+  const store = {
+    get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* private mode: favourites just won't persist */ } }
+  };
+  const favorites = new Set(store.get('warehouseFavorites', []));
+
+  const $ = id => document.getElementById(id);
+  const searchInput = $('searchInput'), searchClear = $('searchClear'), grid = $('filesGrid'), empty = $('emptyState');
+  const modalOverlay = $('modalOverlay'), modalClose = $('modalClose'), modalDownload = $('modalDownload'), modalView = $('modalView'), modalCopyLink = $('modalCopyLink');
+  const uploadZone = $('uploadZone'), fileInput = $('fileInput');
+
+  const escapeHtml = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
   function parseSize(size) {
     const m = String(size).trim().match(/^([\d.]+)\s*(KB|MB|GB)$/i);
     if (!m) return 0;
-    const value = parseFloat(m[1]);
-    const unit = m[2].toUpperCase();
-    if (unit === 'KB') return value / 1024;
-    if (unit === 'MB') return value;
-    return value * 1024;
+    const v = parseFloat(m[1]), u = m[2].toUpperCase();
+    return u === 'KB' ? v / 1024 : u === 'MB' ? v : v * 1024;
   }
-
-  function parseDate(dateStr) {
-    const m = String(dateStr).trim().match(/^([A-Za-z]{3})\s+(\d{1,2}),\s*(\d{4})$/);
+  function parseDate(str) {
+    const m = String(str).trim().match(/^([A-Za-z]{3})\s+(\d{1,2}),\s*(\d{4})$/);
     if (!m) return new Date(0);
-    const months = {
-      Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
-      Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11
-    };
-    const month = months[m[1]] ?? 0;
-    return new Date(Number(m[3]), month, Number(m[2]));
+    const months = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
+    return new Date(Number(m[3]), months[m[1]] ?? 0, Number(m[2]));
   }
-
-  function formatSize(mb) {
-    if (mb >= 1024) return `${(mb / 1024).toFixed(1)} GB`;
-    return `${mb.toFixed(1)} MB`;
-  }
-
+  const formatSize = mb => (mb >= 1024 ? `${(mb / 1024).toFixed(1)} GB` : `${mb.toFixed(1)} MB`);
   function formatFileSize(bytes) {
-    const mb = bytes / 1024 / 1024;
-    if (mb >= 1024) return `${(mb / 1024).toFixed(1)} GB`;
-    return `${mb.toFixed(1)} MB`;
+    if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+    return formatSize(bytes / 1024 / 1024);
   }
 
-  function allFiles() {
-    return [...FILES, ...uploadedFiles].map(file => ({
-      ...file,
-      favorite: favorites.has(String(file.id || file.name))
-    }));
-  }
+  const keyOf = f => String(f.id || f.name);
+  const allFiles = () => [...FILES, ...uploadedFiles].map(f => ({ ...f, favorite: favorites.has(keyOf(f)) }));
+  const findFile = id => allFiles().find(f => keyOf(f) === String(id));
 
   function sortFiles(files) {
-    const sorted = [...files];
-    switch (sortMode) {
-      case 'name':
-        sorted.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case 'size':
-        sorted.sort((a, b) => parseSize(b.size) - parseSize(a.size));
-        break;
-      default:
-        sorted.sort((a, b) => parseDate(b.date) - parseDate(a.date));
-        break;
-    }
-    return sorted;
+    const s = [...files];
+    if (sortMode === 'name') s.sort((a, b) => a.name.localeCompare(b.name));
+    else if (sortMode === 'size') s.sort((a, b) => parseSize(b.size) - parseSize(a.size));
+    else s.sort((a, b) => parseDate(b.date) - parseDate(a.date));
+    return s;
   }
 
   function animateNumber(el, target) {
     if (!el) return;
-    if (prefersReducedMotion) {
-      el.textContent = String(target);
-      return;
-    }
-
-    el.textContent = '0';
-    const duration = 700;
-    const start = performance.now();
-
-    function tick(now) {
-      const p = Math.min((now - start) / duration, 1);
-      const value = Math.round(target * p);
-      el.textContent = String(value);
+    if (prefersReducedMotion) { el.textContent = String(target); return; }
+    const t0 = performance.now(), dur = 900;
+    const tick = now => {
+      const p = Math.min((now - t0) / dur, 1), e = 1 - Math.pow(1 - p, 3);
+      el.textContent = String(Math.round(target * e));
       if (p < 1) requestAnimationFrame(tick);
-    }
-
+    };
     requestAnimationFrame(tick);
   }
-
+  let statsPlayed = false;
   function renderStats() {
     const files = allFiles();
-    const types = new Set(files.map(f => f.type));
-    const totalSize = files.reduce((sum, f) => sum + parseSize(f.size), 0);
-
-    animateNumber(document.getElementById('statFiles'), files.length);
-    animateNumber(document.getElementById('statCategories'), types.size);
-
-    const statSize = document.getElementById('statSize');
-    if (statSize) statSize.textContent = formatSize(totalSize);
-  }
-
-  function findFile(id) {
-    return allFiles().find(f => String(f.id || f.name) === String(id));
+    const total = files.reduce((n, f) => n + parseSize(f.size), 0);
+    const run = () => {
+      animateNumber($('statFiles'), files.length);
+      animateNumber($('statCategories'), new Set(files.map(f => f.type)).size);
+      const sz = $('statSize'); if (sz) sz.textContent = formatSize(total);
+    };
+    if (!statsPlayed) { statsPlayed = true; setTimeout(run, document.documentElement.classList.contains('skip-preload') ? 200 : 1300); }
+    else run();
   }
 
   function getTypeFromName(name) {
     const ext = name.split('.').pop().toLowerCase();
-    if (['pdf'].includes(ext)) return 'pdf';
+    if (ext === 'pdf') return 'pdf';
     if (['ppt', 'pptx'].includes(ext)) return 'pptx';
     if (['mp3', 'wav', 'ogg'].includes(ext)) return 'audio';
     if (['mp4', 'mov', 'webm'].includes(ext)) return 'video';
@@ -364,442 +291,223 @@
   }
 
   function showToast(msg) {
-    const toast = document.getElementById('toast');
-    const toastMsg = document.getElementById('toastMsg');
-    if (!toast || !toastMsg) return;
-    toastMsg.textContent = msg;
+    const toast = $('toast'), m = $('toastMsg');
+    if (!toast || !m) return;
+    m.textContent = msg;
     toast.classList.add('show');
     clearTimeout(showToast._t);
-    showToast._t = setTimeout(() => toast.classList.remove('show'), 2200);
+    showToast._t = setTimeout(() => toast.classList.remove('show'), 2400);
   }
 
-  function getFileUrl(file) {
-    return file?.url || '';
-  }
-
-  function renderFiles() {
+  function renderFiles({ animate = true } = {}) {
     if (!grid) return;
-
     grid.innerHTML = '';
+    grid.classList.toggle('no-anim', !animate);
 
-    const files = sortFiles(allFiles()).filter(f => {
-      const matchFilter = activeFilter === 'all' || f.type === activeFilter;
-      const q = searchTerm.toLowerCase();
-      const matchSearch =
-        f.name.toLowerCase().includes(q) ||
-        (f.desc || '').toLowerCase().includes(q);
-      return matchFilter && matchSearch;
-    });
+    const q = searchTerm.trim().toLowerCase();
+    const files = sortFiles(allFiles()).filter(f =>
+      (activeFilter === 'all' || f.type === activeFilter) &&
+      (f.name.toLowerCase().includes(q) || (f.desc || '').toLowerCase().includes(q))
+    );
 
-    if (!files.length) {
-      empty && (empty.style.display = 'block');
-      return;
-    }
-
+    if (!files.length) { if (empty) empty.style.display = 'block'; return; }
     if (empty) empty.style.display = 'none';
 
-    if (activeFilter === 'all' && !searchTerm && sortMode === 'recent') {
+    if (activeFilter === 'all' && !q && sortMode === 'recent') {
       const groups = {};
-      files.forEach(f => {
-        (groups[f.type] = groups[f.type] || []).push(f);
-      });
-
+      files.forEach(f => (groups[f.type] = groups[f.type] || []).push(f));
+      let n = 0;
       Object.entries(groups).forEach(([type, group]) => {
-        const header = document.createElement('div');
-        header.className = 'category-header';
-        header.innerHTML = `
-          <i class="fa-solid ${TYPE_ICON[type]}"></i>
-          ${CATEGORY_TITLE[type]}
-          <span style="color:var(--accent2);font-size:0.75rem;margin-left:0.3rem">${group.length}</span>
-        `;
-        grid.appendChild(header);
-        group.forEach((file, idx) => grid.appendChild(makeCard(file, idx)));
+        const h = document.createElement('div');
+        h.className = 'category-header';
+        h.innerHTML = `<i class="fa-solid ${TYPE_ICON[type]}" aria-hidden="true"></i>${CATEGORY_TITLE[type]}<span class="count">${group.length}</span>`;
+        grid.appendChild(h);
+        group.forEach(file => grid.appendChild(makeCard(file, n++)));
       });
     } else {
-      files.forEach((file, idx) => grid.appendChild(makeCard(file, idx)));
+      files.forEach((file, i) => grid.appendChild(makeCard(file, i)));
     }
-
-    applyCardTilt();
   }
 
   function makeCard(file, idx) {
+    const name = escapeHtml(file.name);
     const card = document.createElement('div');
     card.className = 'file-card';
-    card.dataset.fileId = String(file.id || file.name);
-    card.dataset.tilt = 'true';
-    card.style.cssText = `--card-color:${file.color}; animation-delay:${idx * 0.04}s`;
+    card.tabIndex = 0;
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-label', `${file.name}, ${TYPE_LABEL[file.type]}, ${file.size}. Open details`);
+    card.dataset.fileId = keyOf(file);
+    card.dataset.tilt = '';
+    card.dataset.spot = '';
+    card.style.cssText = `--card-color:${/^#[0-9a-f]{3,8}$/i.test(file.color) ? file.color : '#8b5cf6'}; animation-delay:${Math.min(idx, 14) * 0.04}s`;
 
     card.innerHTML = `
-      <div class="file-icon ${TYPE_CLASS[file.type]}">
-        <i class="fa-solid ${TYPE_ICON[file.type]}"></i>
-      </div>
-      <div class="file-name" title="${file.name}">${file.name}</div>
-      <div class="file-meta">
-        <span class="file-size">${file.size}</span>
-        <span class="file-date">${file.date}</span>
-      </div>
+      <div class="file-icon ${TYPE_CLASS[file.type]}"><i class="fa-solid ${TYPE_ICON[file.type]}" aria-hidden="true"></i></div>
+      <div class="file-name" title="${name}">${name}</div>
+      <div class="file-meta"><span class="file-size">${escapeHtml(file.size)}</span><span class="file-date">${escapeHtml(file.date)}</span></div>
       <div class="file-card-footer">
         <span class="file-type-badge">${TYPE_LABEL[file.type]}</span>
         <div class="file-actions">
-          <button class="file-action-btn" title="Preview" data-action="preview" aria-label="Preview ${file.name}" type="button">
-            <i class="fa-solid fa-eye"></i>
-          </button>
-          <button class="file-action-btn" title="Download" data-action="download" aria-label="Download ${file.name}" type="button">
-            <i class="fa-solid fa-download"></i>
-          </button>
-          <button class="file-action-btn ${file.favorite ? 'fav-on' : ''}" title="Favorite" data-action="favorite" aria-label="Favorite ${file.name}" type="button">
-            <i class="fa-solid fa-star"></i>
-          </button>
-          <button class="file-action-btn" title="Copy link" data-action="copy" aria-label="Copy link for ${file.name}" type="button">
-            <i class="fa-solid fa-link"></i>
-          </button>
+          <button class="file-action-btn" title="Preview" data-action="preview" aria-label="Preview ${name}" type="button"><i class="fa-solid fa-eye" aria-hidden="true"></i></button>
+          <button class="file-action-btn" title="Download" data-action="download" aria-label="Download ${name}" type="button"><i class="fa-solid fa-download" aria-hidden="true"></i></button>
+          <button class="file-action-btn ${file.favorite ? 'fav-on' : ''}" title="Favorite" data-action="favorite" aria-label="Favorite ${name}" aria-pressed="${file.favorite}" type="button"><i class="fa-solid fa-star" aria-hidden="true"></i></button>
+          <button class="file-action-btn" title="Copy link" data-action="copy" aria-label="Copy link for ${name}" type="button"><i class="fa-solid fa-link" aria-hidden="true"></i></button>
         </div>
-      </div>
-    `;
+      </div>`;
 
-    card.addEventListener('click', e => {
-      if (e.target.closest('.file-action-btn')) return;
-      openModal(file.id || file.name);
+    card.addEventListener('click', e => { if (!e.target.closest('.file-action-btn')) openModal(keyOf(file)); });
+    card.addEventListener('keydown', e => {
+      if (e.target === card && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openModal(keyOf(file)); }
     });
-
     return card;
   }
 
-  function openModal(id, e) {
-    e?.stopPropagation();
-
+  /* ---------- modal ---------- */
+  let modalFile = null;
+  function openModal(id) {
     const file = findFile(id);
     if (!file) return;
+    modalFile = file;
+    lastFocus = document.activeElement;
 
-    const icon = document.getElementById('modalIcon');
-    const name = document.getElementById('modalName');
-    const type = document.getElementById('modalType');
-    const size = document.getElementById('modalSize');
-    const date = document.getElementById('modalDate');
-    const desc = document.getElementById('modalDesc');
+    const icon = $('modalIcon');
+    icon.className = `modal-icon ${TYPE_CLASS[file.type]}`;
+    icon.innerHTML = `<i class="fa-solid ${TYPE_ICON[file.type]}" aria-hidden="true"></i>`;
+    $('modalName').textContent = file.name;
+    $('modalType').textContent = TYPE_LABEL[file.type];
+    $('modalSize').textContent = file.size;
+    $('modalDate').textContent = file.date;
+    $('modalDesc').textContent = file.desc || 'No description available.';
 
-    if (icon) {
-      icon.className = `modal-icon ${TYPE_CLASS[file.type]}`;
-      icon.innerHTML = `<i class="fa-solid ${TYPE_ICON[file.type]}"></i>`;
-    }
+    const url = file.url || '';
+    if (url) { modalDownload.href = url; modalDownload.setAttribute('download', file.name); }
+    else { modalDownload.href = '#'; modalDownload.removeAttribute('download'); }
+    if (url) { modalView.href = url; modalView.style.display = 'inline-flex'; }
+    else { modalView.href = '#'; modalView.style.display = 'none'; }
 
-    if (name) name.textContent = file.name;
-    if (type) type.textContent = TYPE_LABEL[file.type];
-    if (size) size.textContent = file.size;
-    if (date) date.textContent = file.date;
-    if (desc) desc.textContent = file.desc || 'No description available.';
-
-    const url = getFileUrl(file);
-
-    if (modalDownload) {
-      if (url) {
-        modalDownload.href = url;
-        modalDownload.setAttribute('download', file.name);
-      } else {
-        modalDownload.href = '#';
-        modalDownload.removeAttribute('download');
-      }
-    }
-
-    if (modalView) {
-      if (url) {
-        modalView.href = url;
-        modalView.target = '_blank';
-        modalView.rel = 'noopener';
-        modalView.style.display = 'inline-flex';
-      } else {
-        modalView.href = '#';
-        modalView.removeAttribute('target');
-        modalView.removeAttribute('rel');
-        modalView.style.display = 'none';
-      }
-    }
-
-    modalOverlay?.classList.add('open');
+    modalOverlay.classList.add('open');
+    modalOverlay.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => modalClose.focus(), 50);
   }
-
   function closeModal() {
-    modalOverlay?.classList.remove('open');
+    if (!modalOverlay.classList.contains('open')) return;
+    modalOverlay.classList.remove('open');
+    modalOverlay.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    modalFile = null;
+    lastFocus?.focus?.();
   }
+  /* keep keyboard focus inside the dialog while open */
+  modalOverlay?.addEventListener('keydown', e => {
+    if (e.key !== 'Tab') return;
+    const f = [...modalOverlay.querySelectorAll('a[href], button')].filter(el => el.offsetParent !== null);
+    if (!f.length) return;
+    const first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+  modalClose?.addEventListener('click', closeModal);
+  modalOverlay?.addEventListener('click', e => { if (e.target === modalOverlay) closeModal(); });
 
-  function copyLink(e, name) {
-    e?.stopPropagation();
-
-    const file = allFiles().find(f => f.name === name);
+  async function copyLink(file) {
     const url = file?.url
-      ? new URL(file.url, window.location.href).href
-      : new URL(`warehouse.html?file=${encodeURIComponent(name)}`, window.location.href).href;
-
-    navigator.clipboard.writeText(url).catch(() => {});
-    showToast(`Link copied for "${name}"`);
+      ? new URL(file.url, location.href).href
+      : new URL(`warehouse.html?file=${encodeURIComponent(file?.name || '')}`, location.href).href;
+    try { await navigator.clipboard.writeText(url); showToast(`Link copied for "${file.name}"`); }
+    catch (e) { showToast('Could not copy automatically — copy it from the address bar.'); }
   }
 
-  function setFavorite(id, on) {
-    const key = String(id);
-    if (on) favorites.add(key);
-    else favorites.delete(key);
-    localStorage.setItem('warehouseFavorites', JSON.stringify([...favorites]));
-    renderFiles();
-    renderStats();
-  }
+  modalCopyLink?.addEventListener('click', () => modalFile && copyLink(modalFile));
+  modalDownload?.addEventListener('click', e => { if (!modalFile?.url) { e.preventDefault(); showToast('This file is a demo item.'); } });
+  modalView?.addEventListener('click', e => { if (!modalFile?.url) { e.preventDefault(); showToast('No real file available.'); } });
 
-  function applyCardTilt() {
-    if (isTouchDevice) return;
-
-    document.querySelectorAll('.file-card[data-tilt="true"]').forEach(card => {
-      if (card.dataset.tiltBound) return;
-      card.dataset.tiltBound = '1';
-
-      card.addEventListener('mousemove', e => {
-        const rect = card.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / rect.width;
-        const y = (e.clientY - rect.top) / rect.height;
-        const rotY = (x - 0.5) * 10;
-        const rotX = (0.5 - y) * 10;
-        card.style.transform = `perspective(900px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateY(-4px)`;
-      });
-
-      card.addEventListener('mouseleave', () => {
-        card.style.transform = '';
-      });
-    });
-  }
-
-  function updateScrollUI() {
-    const scrollTop = window.scrollY || document.documentElement.scrollTop;
-    navbar?.classList.toggle('scrolled', scrollTop > 50);
-
-    if (scrollProgress) {
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      scrollProgress.style.width = docHeight > 0 ? `${(scrollTop / docHeight) * 100}%` : '0%';
-    }
-
-    backToTop?.classList.toggle('show', scrollTop > window.innerHeight * 0.6);
-  }
-
-  function updateMobileNav() {
-    if (window.innerWidth <= 900) {
-      document.querySelector('.nav-links')?.classList.remove('open');
-      document.getElementById('hamburger')?.classList.remove('open');
-    }
-  }
-
-  document.getElementById('filterBtns')?.addEventListener('click', e => {
+  /* ---------- toolbar ---------- */
+  $('filterBtns')?.addEventListener('click', e => {
     const btn = e.target.closest('.filter-btn');
     if (!btn) return;
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+    document.querySelectorAll('.filter-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
+    btn.classList.add('active'); btn.setAttribute('aria-pressed', 'true');
     activeFilter = btn.dataset.filter;
     renderFiles();
   });
-
-  document.getElementById('sortSelect')?.addEventListener('change', e => {
-    sortMode = e.target.value;
-    renderFiles();
-  });
-
+  $('sortSelect')?.addEventListener('change', e => { sortMode = e.target.value; renderFiles(); });
   searchInput?.addEventListener('input', () => {
     searchTerm = searchInput.value;
     searchClear?.classList.toggle('visible', !!searchTerm);
-    renderFiles();
+    renderFiles({ animate: false });
   });
-
   searchClear?.addEventListener('click', () => {
-    if (searchInput) searchInput.value = '';
-    searchTerm = '';
+    searchInput.value = ''; searchTerm = '';
     searchClear.classList.remove('visible');
-    renderFiles();
+    renderFiles({ animate: false });
+    searchInput.focus();
   });
 
-  document.getElementById('gridView')?.addEventListener('click', function () {
-    viewMode = 'grid';
-    this.classList.add('active');
-    document.getElementById('listView')?.classList.remove('active');
-    document.getElementById('filesGrid')?.classList.remove('list-view');
-  });
+  function setView(list) {
+    grid.classList.toggle('list-view', list);
+    $('gridView').classList.toggle('active', !list); $('gridView').setAttribute('aria-pressed', String(!list));
+    $('listView').classList.toggle('active', list);  $('listView').setAttribute('aria-pressed', String(list));
+  }
+  $('gridView')?.addEventListener('click', () => setView(false));
+  $('listView')?.addEventListener('click', () => setView(true));
 
-  document.getElementById('listView')?.addEventListener('click', function () {
-    viewMode = 'list';
-    this.classList.add('active');
-    document.getElementById('gridView')?.classList.remove('active');
-    document.getElementById('filesGrid')?.classList.add('list-view');
-  });
-
-  uploadZone?.addEventListener('click', () => fileInput?.click());
-
-  uploadZone?.addEventListener('dragover', e => {
-    e.preventDefault();
-    uploadZone.classList.add('drag-over');
-  });
-
-  uploadZone?.addEventListener('dragleave', () => {
-    uploadZone.classList.remove('drag-over');
-  });
-
-  uploadZone?.addEventListener('drop', e => {
-    e.preventDefault();
-    uploadZone.classList.remove('drag-over');
-
-    const dropped = [...(e.dataTransfer?.files || [])];
-    if (!dropped.length) return;
-
-    dropped.forEach(file => {
-      uploadedFiles.push({
-        id: `u-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-        name: file.name,
-        type: getTypeFromName(file.name),
-        size: formatFileSize(file.size),
-        date: new Date().toLocaleDateString('en-US', {
-          month: 'short',
-          day: '2-digit',
-          year: 'numeric'
-        }),
-        desc: 'Uploaded from your device.',
-        color: '#a855f7',
-        url: ''
-      });
-    });
-
-    renderFiles();
-    renderStats();
-    showToast(`${dropped.length} file(s) added to warehouse`);
-  });
-
-  fileInput?.addEventListener('change', () => {
-    const chosen = [...(fileInput.files || [])];
+  /* ---------- uploads (session-only: files are previewed locally, never sent anywhere) ---------- */
+  function addFiles(list) {
+    const chosen = [...list];
     if (!chosen.length) return;
-
     chosen.forEach(file => {
       uploadedFiles.push({
         id: `u-${Date.now()}-${Math.random().toString(16).slice(2)}`,
         name: file.name,
         type: getTypeFromName(file.name),
         size: formatFileSize(file.size),
-        date: new Date().toLocaleDateString('en-US', {
-          month: 'short',
-          day: '2-digit',
-          year: 'numeric'
-        }),
-        desc: 'Uploaded from your device.',
-        color: '#a855f7',
-        url: ''
+        date: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
+        desc: 'Added from your device for this visit only — it is not uploaded anywhere.',
+        color: '#e879d9',
+        url: URL.createObjectURL(file)
       });
     });
+    renderFiles(); renderStats();
+    showToast(`${chosen.length} file${chosen.length > 1 ? 's' : ''} added (this session only)`);
+  }
+  uploadZone?.addEventListener('click', () => fileInput?.click());
+  uploadZone?.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput?.click(); } });
+  uploadZone?.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+  uploadZone?.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+  uploadZone?.addEventListener('drop', e => { e.preventDefault(); uploadZone.classList.remove('drag-over'); addFiles(e.dataTransfer?.files || []); });
+  fileInput?.addEventListener('change', () => { addFiles(fileInput.files || []); fileInput.value = ''; });
 
-    renderFiles();
-    renderStats();
-    showToast(`${chosen.length} file(s) added to warehouse`);
-    fileInput.value = '';
-  });
-
-  document.getElementById('filesGrid')?.addEventListener('click', e => {
+  /* ---------- card actions ---------- */
+  grid?.addEventListener('click', e => {
     const btn = e.target.closest('.file-action-btn');
     if (!btn) return;
-
-    const card = e.target.closest('.file-card');
-    if (!card) return;
-
-    const file = findFile(card.dataset.fileId);
+    const card = btn.closest('.file-card');
+    const file = card && findFile(card.dataset.fileId);
     if (!file) return;
-
     e.stopPropagation();
-
     const action = btn.dataset.action;
-    const url = getFileUrl(file);
 
-    if (action === 'preview') {
-      return openModal(file.id || file.name);
-    }
-
+    if (action === 'preview') return openModal(keyOf(file));
+    if (action === 'copy') return copyLink(file);
     if (action === 'download') {
-      if (!url) {
-        showToast('This file is a demo item.');
-        return;
-      }
+      if (!file.url) return showToast('This file is a demo item.');
       const a = document.createElement('a');
-      a.href = url;
-      a.download = file.name;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
+      a.href = file.url; a.download = file.name;
+      document.body.appendChild(a); a.click(); a.remove();
       return;
     }
-
-    if (action === 'copy') {
-      return copyLink(e, file.name);
-    }
-
     if (action === 'favorite') {
-      const wasFavorite = favorites.has(String(file.id || file.name));
-      setFavorite(file.id || file.name, !wasFavorite);
-      showToast(!wasFavorite ? 'Added to favorites' : 'Removed from favorites');
-      return;
+      const key = keyOf(file), was = favorites.has(key);
+      was ? favorites.delete(key) : favorites.add(key);
+      store.set('warehouseFavorites', [...favorites]);
+      btn.classList.toggle('fav-on', !was);
+      btn.setAttribute('aria-pressed', String(!was));
+      showToast(was ? 'Removed from favorites' : 'Added to favorites');
     }
   });
 
-  modalClose?.addEventListener('click', closeModal);
-
-  modalOverlay?.addEventListener('click', e => {
-    if (e.target.id === 'modalOverlay') closeModal();
-  });
-
-  modalCopyLink?.addEventListener('click', () => {
-    const name = document.getElementById('modalName')?.textContent || '';
-    copyLink(null, name);
-  });
-
-  modalDownload?.addEventListener('click', e => {
-    const name = document.getElementById('modalName')?.textContent || '';
-    const file = allFiles().find(f => f.name === name);
-    if (!file?.url) {
-      e.preventDefault();
-      showToast('This file is a demo item.');
-    }
-  });
-
-  modalView?.addEventListener('click', e => {
-    const name = document.getElementById('modalName')?.textContent || '';
-    const file = allFiles().find(f => f.name === name);
-    if (!file?.url) {
-      e.preventDefault();
-      showToast('No real file available.');
-    }
-  });
-
-  document.getElementById('hamburger')?.addEventListener('click', () => {
-    document.querySelector('.nav-links')?.classList.toggle('open');
-    document.getElementById('hamburger')?.classList.toggle('open');
-  });
-
-  document.querySelectorAll('.nav-links a').forEach(link => {
-    link.addEventListener('click', updateMobileNav);
-  });
-
-  backToTop?.addEventListener('click', () => {
-    window.scrollTo({
-      top: 0,
-      behavior: prefersReducedMotion ? 'auto' : 'smooth'
-    });
-  });
-
-  window.addEventListener('scroll', updateScrollUI, { passive: true });
-  window.addEventListener('resize', () => {
-    updateScrollUI();
-    if (window.innerWidth <= 900) updateMobileNav();
-  });
-
-  window.addEventListener('load', () => {
-    if (preloader) {
-      preloader.classList.add('hide');
-      setTimeout(() => preloader.remove(), prefersReducedMotion ? 100 : 700);
-    }
-  });
-
-  function init() {
-    renderStats();
-    renderFiles();
-    updateScrollUI();
-  }
-
-  init();
+  renderStats();
+  renderFiles();
 })();

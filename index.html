@@ -4,223 +4,242 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Adrit Singh — Portfolio</title>
+  <meta name="description" content="Adrit Singh — a teen maker blending electronics, mechanics, embedded AI, microcontrollers and web development into real projects."/>
+  <meta name="theme-color" content="#0b0613"/>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b0613'/%3E%3Ctext x='32' y='43' font-family='Arial' font-weight='800' font-size='30' text-anchor='middle' fill='%23e879d9'%3EAS%3C/text%3E%3C/svg%3E"/>
+  <script>
+    document.documentElement.classList.add('js');
+    try { if (sessionStorage.getItem('as-visited')) document.documentElement.classList.add('skip-preload'); } catch (e) {}
+  </script>
+  <noscript><style>.preloader{display:none}</style></noscript>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="css/style.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="css/style.css"/>
 </head>
 <body>
 
   <div class="preloader" id="preloader" aria-hidden="true">
-    <div class="preloader-card">
-      <div class="preloader-mark">AS</div>
-      <div class="preloader-bar"><span></span></div>
-      <p>Loading Adrit Singh’s workspace...</p>
+    <div class="pl-inner">
+      <div class="pl-mark"><span>A</span><span>S</span></div>
+      <div class="pl-line"><span id="plBar"></span></div>
+      <p class="pl-count"><span id="plNum">0</span>%</p>
     </div>
   </div>
-  <div class="scroll-progress"><span id="scrollProgress"></span></div>
+  <div class="scroll-progress" aria-hidden="true"><span id="scrollProgress"></span></div>
 
-  <!-- ░░ CURSOR ░░ -->
-  <div class="cursor"></div>
-  <div class="cursor-follower"></div>
+  <div class="cursor" aria-hidden="true"></div>
+  <div class="cursor-follower" aria-hidden="true"></div>
 
-  <!-- ░░ NAVBAR ░░ -->
-  <nav class="navbar" id="navbar">
-    <div class="nav-logo">
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar" aria-label="Main">
+    <a class="nav-logo" href="#home" aria-label="Adrit Singh — home">
       <span class="logo-text">ADRIT <span class="accent">SINGH</span></span>
-    </div>
-    <ul class="nav-links">
-      <li><a href="#home" class="nav-link active">Home</a></li>
-      <li><a href="#about" class="nav-link">About</a></li>
-      <li><a href="#projects" class="nav-link">Projects</a></li>
-      <li><a href="#skills" class="nav-link">Skills</a></li>
-      <li><a href="#contact" class="nav-link">Contact</a></li>
-      <li><a href="warehouse.html" class="nav-link nav-warehouse"><i class="fa-solid fa-warehouse"></i> Warehouse</a></li>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li style="--i:0"><a href="#home" class="nav-link active">Home</a></li>
+      <li style="--i:1"><a href="#about" class="nav-link">About</a></li>
+      <li style="--i:2"><a href="#projects" class="nav-link">Projects</a></li>
+      <li style="--i:3"><a href="#skills" class="nav-link">Skills</a></li>
+      <li style="--i:4"><a href="#contact" class="nav-link">Contact</a></li>
+      <li style="--i:5"><a href="warehouse.html" class="nav-link nav-warehouse"><i class="fa-solid fa-warehouse" aria-hidden="true"></i> Warehouse</a></li>
     </ul>
-    <div class="hamburger" id="hamburger">
+    <button class="hamburger" id="hamburger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
       <span></span><span></span><span></span>
-    </div>
+    </button>
   </nav>
 
-  <!-- ░░ HERO ░░ -->
+  <main>
+  <!-- HERO -->
   <section class="hero" id="home">
-    <div class="hero-bg">
+    <div class="hero-bg" aria-hidden="true">
       <div class="blob blob-1"></div>
       <div class="blob blob-2"></div>
       <div class="blob blob-3"></div>
       <canvas id="particles"></canvas>
     </div>
-    <div class="hero-content">
-      <p class="hero-greeting animate-in">👋 Hello, I'm</p>
-      <h1 class="hero-name animate-in delay-1">
-        <span class="name-first">Adrit</span>
-        <span class="name-last">Singh</span>
+
+    <div class="hero-content" data-stagger>
+      <p class="hero-greeting" data-reveal><span class="line"></span>Hello, I'm</p>
+      <h1 class="hero-name" data-split aria-label="Adrit Singh">
+        <span class="name-line name-first" aria-hidden="true">Adrit</span>
+        <span class="name-line name-last" aria-hidden="true">Singh</span>
       </h1>
-      <div class="hero-role animate-in delay-2">
-        <span class="role-prefix">I'm a </span>
-        <span class="typewriter" id="typewriter"></span>
-        <span class="cursor-blink">|</span>
+      <div class="hero-role" data-reveal>
+        <span class="role-prefix">I'm a </span><span class="typewriter" id="typewriter">Web Developer</span><span class="cursor-blink" aria-hidden="true">|</span>
       </div>
-      <p class="hero-desc animate-in delay-3">
+      <p class="hero-desc" data-reveal>
         A teen maker blending electronics, mechanics, embedded AI, microcontrollers, and web development into real projects that actually do something.
       </p>
-      <div class="hero-cta animate-in delay-4">
-        <a href="#projects" class="btn btn-primary">View My Work</a>
-        <a href="warehouse.html" class="btn btn-secondary"><i class="fa-solid fa-warehouse"></i> My Warehouse</a>
+      <div class="hero-cta" data-reveal>
+        <a href="#projects" class="btn btn-primary" data-magnetic>View My Work <i class="fa-solid fa-arrow-down" aria-hidden="true"></i></a>
+        <a href="warehouse.html" class="btn btn-secondary" data-magnetic><i class="fa-solid fa-warehouse" aria-hidden="true"></i> My Warehouse</a>
       </div>
-      <div class="hero-socials animate-in delay-5">
-        <a href="#" class="social-icon"><i class="fab fa-github"></i></a>
-        <a href="#" class="social-icon"><i class="fab fa-linkedin"></i></a>
-        <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
-        <a href="#" class="social-icon"><i class="fab fa-dribbble"></i></a>
+      <div class="hero-socials" data-reveal>
+        <a href="#" class="social-icon" data-magnetic aria-label="GitHub"><i class="fab fa-github" aria-hidden="true"></i></a>
+        <a href="#" class="social-icon" data-magnetic aria-label="LinkedIn"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+        <a href="#" class="social-icon" data-magnetic aria-label="Twitter"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+        <a href="#" class="social-icon" data-magnetic aria-label="Dribbble"><i class="fab fa-dribbble" aria-hidden="true"></i></a>
       </div>
     </div>
-    <div class="hero-visual animate-in delay-3">
+
+    <div class="hero-visual" data-reveal="scale" aria-hidden="true">
       <div class="avatar-container">
         <div class="avatar-ring ring-1"></div>
         <div class="avatar-ring ring-2"></div>
-        <div class="avatar-ring ring-3"></div>
-        <div class="avatar-img">
-          <i class="fa-solid fa-user"></i>
+        <div class="avatar-spin"></div>
+        <div class="avatar-img"><i class="fa-solid fa-user"></i></div>
+        <div class="orbit orbit-1">
+          <div class="orbit-item" style="--a:-40deg;--r:min(190px,36vw)"><div class="tech-bubble b1"><i class="fa-brands fa-html5"></i></div></div>
+          <div class="orbit-item" style="--a:140deg;--r:min(190px,36vw)"><div class="tech-bubble b3"><i class="fa-brands fa-python"></i></div></div>
         </div>
-        <div class="tech-bubble b1"><i class="fa-brands fa-html5"></i></div>
-        <div class="tech-bubble b2"><i class="fa-solid fa-microchip"></i></div>
-        <div class="tech-bubble b3"><i class="fa-brands fa-python"></i></div>
-        <div class="tech-bubble b4"><i class="fa-brands fa-linux"></i></div>
+        <div class="orbit orbit-2">
+          <div class="orbit-item" style="--a:50deg;--r:min(190px,36vw)"><div class="tech-bubble b2"><i class="fa-solid fa-microchip"></i></div></div>
+          <div class="orbit-item" style="--a:230deg;--r:min(190px,36vw)"><div class="tech-bubble b4"><i class="fa-brands fa-linux"></i></div></div>
+        </div>
       </div>
     </div>
+
+    <a class="scroll-cue" href="#about" aria-label="Scroll to About"><span></span>Scroll</a>
   </section>
 
-  <!-- ░░ ABOUT ░░ -->
+  <!-- MARQUEE BAND -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track" data-speed="1">
+      <span>Electronics</span><span>Embedded AI</span><span>Microcontrollers</span><span>Mechanics</span><span>Web Development</span><span>Python</span>
+    </div>
+  </div>
+  <div class="marquee marquee-alt" aria-hidden="true">
+    <div class="marquee-track" data-speed="-1">
+      <span>C++</span><span>Embedded C</span><span>Linux</span><span>HTML / CSS</span><span>JavaScript</span><span>Sensors</span>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
   <section class="about section" id="about">
     <div class="container">
-      <div class="section-header">
-        <span class="section-tag">About Me</span>
-        <h2 class="section-title">Who I Am</h2>
+      <div class="section-header" data-split-words>
+        <span class="section-tag" data-reveal><b>01</b> About Me</span>
+        <h2 class="section-title" data-reveal>Who <em>I Am</em></h2>
       </div>
       <div class="about-grid">
         <div class="about-text">
-          <p>I'm a teen tech builder with <strong>3+ years</strong> of hands-on experience exploring electronics, mechanics, embedded AI, microcontrollers, and web development.</p>
-          <p>I love turning ideas into real projects — from circuit experiments and smart devices to clean websites, automation tools, and practical prototypes that keep learning exciting.</p>
-          <div class="about-stats">
+          <p data-reveal="left">I'm a teen tech builder with <strong>3+ years</strong> of hands-on experience exploring electronics, mechanics, embedded AI, microcontrollers, and web development.</p>
+          <p data-reveal="left" style="--d:100ms">I love turning ideas into real projects — from circuit experiments and smart devices to clean websites, automation tools, and practical prototypes that keep learning exciting.</p>
+          <div class="about-stats" data-reveal="left" style="--d:200ms">
             <div class="stat"><span class="stat-num" data-target="20">0</span><span class="stat-label">Projects</span></div>
             <div class="stat"><span class="stat-num" data-target="12">0</span><span class="stat-label">Builds</span></div>
             <div class="stat"><span class="stat-num" data-target="3">0</span><span class="stat-label">Years Exp</span></div>
           </div>
         </div>
-        <div class="about-cards">
-          <div class="info-card"><i class="fa-solid fa-microchip"></i><h4>Embedded Systems</h4><p>Microcontrollers, sensors, LEDs, and embedded logic come together here.</p></div>
-          <div class="info-card"><i class="fa-solid fa-code"></i><h4>Web Developer</h4><p>Fast, responsive interfaces using HTML, CSS, JavaScript, and Python.</p></div>
-          <div class="info-card"><i class="fa-solid fa-gears"></i><h4>Electronics + Mechanics</h4><p>Hands-on tinkering with circuits, motion, and mechanical ideas.</p></div>
-          <div class="info-card"><i class="fa-solid fa-warehouse"></i><h4>Warehouse</h4><p>All my files and school work live in my <a href="warehouse.html">Warehouse</a>.</p></div>
+        <div class="about-cards" data-stagger>
+          <div class="info-card" data-reveal="scale" data-spot data-tilt><i class="fa-solid fa-microchip" aria-hidden="true"></i><h3>Embedded Systems</h3><p>Microcontrollers, sensors, LEDs, and embedded logic come together here.</p></div>
+          <div class="info-card" data-reveal="scale" data-spot data-tilt><i class="fa-solid fa-code" aria-hidden="true"></i><h3>Web Developer</h3><p>Fast, responsive interfaces using HTML, CSS, JavaScript, and Python.</p></div>
+          <div class="info-card" data-reveal="scale" data-spot data-tilt><i class="fa-solid fa-gears" aria-hidden="true"></i><h3>Electronics + Mechanics</h3><p>Hands-on tinkering with circuits, motion, and mechanical ideas.</p></div>
+          <div class="info-card" data-reveal="scale" data-spot data-tilt><i class="fa-solid fa-warehouse" aria-hidden="true"></i><h3>Warehouse</h3><p>All my files and school work live in my <a href="warehouse.html">Warehouse</a>.</p></div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ░░ PROJECTS ░░ -->
+  <!-- PROJECTS -->
   <section class="projects section" id="projects">
     <div class="container">
-      <div class="section-header">
-        <span class="section-tag">Portfolio</span>
-        <h2 class="section-title">Featured Projects</h2>
+      <div class="section-header" data-split-words>
+        <span class="section-tag" data-reveal><b>02</b> Portfolio</span>
+        <h2 class="section-title" data-reveal>Featured <em>Projects</em></h2>
       </div>
-      <div class="projects-grid">
-        <div class="project-card" data-tilt>
-          <div class="project-img" style="background: linear-gradient(135deg,#667eea,#764ba2)">
-            <i class="fa-solid fa-house-signal"></i>
-          </div>
+      <div class="projects-grid" data-stagger>
+        <article class="project-card" data-reveal data-spot data-tilt>
+          <div class="project-img pi-1"><i class="fa-solid fa-house-signal" aria-hidden="true"></i></div>
           <div class="project-info">
             <span class="project-tag">IoT</span>
             <h3>Smart Home Controller</h3>
             <p>Microcontroller-powered automation dashboard for lights, sensors, and status monitoring.</p>
             <div class="project-links">
-              <a href="#" class="btn btn-sm">Live <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-              <a href="#" class="btn btn-sm btn-ghost">Code <i class="fab fa-github"></i></a>
+              <a href="#" class="btn btn-sm btn-primary">Live <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+              <a href="#" class="btn btn-sm btn-ghost">Code <i class="fab fa-github" aria-hidden="true"></i></a>
             </div>
           </div>
-        </div>
-        <div class="project-card" data-tilt>
-          <div class="project-img" style="background: linear-gradient(135deg,#f093fb,#f5576c)">
-            <i class="fa-solid fa-robot"></i>
-          </div>
+        </article>
+        <article class="project-card" data-reveal data-spot data-tilt>
+          <div class="project-img pi-2"><i class="fa-solid fa-robot" aria-hidden="true"></i></div>
           <div class="project-info">
             <span class="project-tag">Robotics</span>
             <h3>Line-Following Robot</h3>
             <p>Built around motors, sensors, and logic control for a practical mechanics + electronics project.</p>
             <div class="project-links">
-              <a href="#" class="btn btn-sm">Live <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-              <a href="#" class="btn btn-sm btn-ghost">Code <i class="fab fa-github"></i></a>
+              <a href="#" class="btn btn-sm btn-primary">Live <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+              <a href="#" class="btn btn-sm btn-ghost">Code <i class="fab fa-github" aria-hidden="true"></i></a>
             </div>
           </div>
-        </div>
-        <div class="project-card" data-tilt>
-          <div class="project-img" style="background: linear-gradient(135deg,#4facfe,#00f2fe)">
-            <i class="fa-solid fa-laptop-code"></i>
-          </div>
+        </article>
+        <article class="project-card" data-reveal data-spot data-tilt>
+          <div class="project-img pi-3"><i class="fa-solid fa-laptop-code" aria-hidden="true"></i></div>
           <div class="project-info">
             <span class="project-tag">Web App</span>
             <h3>Portfolio Warehouse</h3>
             <p>Responsive file vault for school work, PDFs, and quick previews across devices.</p>
             <div class="project-links">
-              <a href="#" class="btn btn-sm">Live <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-              <a href="#" class="btn btn-sm btn-ghost">Code <i class="fab fa-github"></i></a>
+              <a href="warehouse.html" class="btn btn-sm btn-primary">Live <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+              <a href="#" class="btn btn-sm btn-ghost">Code <i class="fab fa-github" aria-hidden="true"></i></a>
             </div>
           </div>
-        </div>
+        </article>
       </div>
     </div>
   </section>
 
-  <!-- ░░ SKILLS ░░ -->
+  <!-- SKILLS -->
   <section class="skills section" id="skills">
     <div class="container">
-      <div class="section-header">
-        <span class="section-tag">Expertise</span>
-        <h2 class="section-title">Skills & Tools</h2>
+      <div class="section-header" data-split-words>
+        <span class="section-tag" data-reveal><b>03</b> Expertise</span>
+        <h2 class="section-title" data-reveal>Skills <em>&amp; Tools</em></h2>
       </div>
-      <div class="skills-grid">
-        <div class="skill-item" data-skill="C++" data-level="58"><div class="skill-bar"><div class="skill-fill"></div></div></div>
-        <div class="skill-item" data-skill="Python" data-level="55"><div class="skill-bar"><div class="skill-fill"></div></div></div>
-        <div class="skill-item" data-skill="HTML/CSS" data-level="60"><div class="skill-bar"><div class="skill-fill"></div></div></div>
-        <div class="skill-item" data-skill="Linux" data-level="50"><div class="skill-bar"><div class="skill-fill"></div></div></div>
-        <div class="skill-item" data-skill="Embedded C" data-level="52"><div class="skill-bar"><div class="skill-fill"></div></div></div>
-        <div class="skill-item" data-skill="JavaScript" data-level="45"><div class="skill-bar"><div class="skill-fill"></div></div></div>
+      <div class="skills-grid" data-stagger>
+        <div class="skill-item" data-reveal data-spot data-level="58"><div class="skill-head"><span class="skill-name">C++</span><span class="skill-pct">58%</span></div><div class="skill-bar" role="progressbar" aria-label="C++" aria-valuemin="0" aria-valuemax="100" aria-valuenow="58"><div class="skill-fill"></div></div></div>
+        <div class="skill-item" data-reveal data-spot data-level="55"><div class="skill-head"><span class="skill-name">Python</span><span class="skill-pct">55%</span></div><div class="skill-bar" role="progressbar" aria-label="Python" aria-valuemin="0" aria-valuemax="100" aria-valuenow="55"><div class="skill-fill"></div></div></div>
+        <div class="skill-item" data-reveal data-spot data-level="60"><div class="skill-head"><span class="skill-name">HTML/CSS</span><span class="skill-pct">60%</span></div><div class="skill-bar" role="progressbar" aria-label="HTML/CSS" aria-valuemin="0" aria-valuemax="100" aria-valuenow="60"><div class="skill-fill"></div></div></div>
+        <div class="skill-item" data-reveal data-spot data-level="50"><div class="skill-head"><span class="skill-name">Linux</span><span class="skill-pct">50%</span></div><div class="skill-bar" role="progressbar" aria-label="Linux" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"><div class="skill-fill"></div></div></div>
+        <div class="skill-item" data-reveal data-spot data-level="52"><div class="skill-head"><span class="skill-name">Embedded C</span><span class="skill-pct">52%</span></div><div class="skill-bar" role="progressbar" aria-label="Embedded C" aria-valuemin="0" aria-valuemax="100" aria-valuenow="52"><div class="skill-fill"></div></div></div>
+        <div class="skill-item" data-reveal data-spot data-level="45"><div class="skill-head"><span class="skill-name">JavaScript</span><span class="skill-pct">45%</span></div><div class="skill-bar" role="progressbar" aria-label="JavaScript" aria-valuemin="0" aria-valuemax="100" aria-valuenow="45"><div class="skill-fill"></div></div></div>
       </div>
     </div>
   </section>
 
-  <!-- ░░ CONTACT ░░ -->
+  <!-- CONTACT -->
   <section class="contact section" id="contact">
     <div class="container">
-      <div class="section-header">
-        <span class="section-tag">Get In Touch</span>
-        <h2 class="section-title">Contact Me</h2>
+      <div class="section-header" data-split-words>
+        <span class="section-tag" data-reveal><b>04</b> Get In Touch</span>
+        <h2 class="section-title" data-reveal>Contact <em>Me</em></h2>
       </div>
       <div class="contact-grid">
-        <div class="contact-info">
-          <a class="contact-item" href="mailto:singhadrit073@gmail.com"><i class="fa-solid fa-envelope"></i><span>singhadrit073@gmail.com</span></a>
-          <a class="contact-item" href="tel:+918210913396"><i class="fa-solid fa-phone"></i><span>+91 82109 13396</span></a>
-          <div class="contact-item"><i class="fa-solid fa-location-dot"></i><span>Bihar, India</span></div>
+        <div class="contact-info" data-stagger>
+          <a class="contact-item" data-reveal="left" href="mailto:singhadrit073@gmail.com"><i class="fa-solid fa-envelope" aria-hidden="true"></i><span>singhadrit073@gmail.com</span></a>
+          <a class="contact-item" data-reveal="left" href="tel:+918210913396"><i class="fa-solid fa-phone" aria-hidden="true"></i><span>+91 82109 13396</span></a>
+          <div class="contact-item" data-reveal="left"><i class="fa-solid fa-location-dot" aria-hidden="true"></i><span>Bihar, India</span></div>
         </div>
-        <form class="contact-form" id="contactForm">
-          <input type="text" placeholder="Your Name" class="form-input" required/>
-          <input type="email" placeholder="Your Email" class="form-input" required/>
-          <textarea placeholder="Your Message" class="form-input form-textarea" rows="5" required></textarea>
-          <button type="submit" class="btn btn-primary">Send Message <i class="fa-solid fa-paper-plane"></i></button>
+        <form class="contact-form" id="contactForm" data-reveal="right" novalidate>
+          <div class="field"><input class="form-input" id="f-name" name="name" type="text" placeholder=" " autocomplete="name" required/><label for="f-name">Your name</label></div>
+          <div class="field"><input class="form-input" id="f-email" name="email" type="email" placeholder=" " autocomplete="email" required/><label for="f-email">Your email</label></div>
+          <div class="field"><textarea class="form-input form-textarea" id="f-msg" name="message" placeholder=" " rows="5" required></textarea><label for="f-msg">Your message</label></div>
+          <button type="submit" class="btn btn-primary" data-magnetic>Send Message <i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button>
+          <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
         </form>
       </div>
     </div>
   </section>
+  </main>
 
-  <!-- ░░ FOOTER ░░ -->
   <footer class="footer">
-    <p>Designed & Built by <span class="accent">Adrit Singh</span> · <a href="warehouse.html"><i class="fa-solid fa-warehouse"></i> Warehouse</a></p>
+    <p>Designed &amp; Built by <span class="accent">Adrit Singh</span> · <a href="warehouse.html"><i class="fa-solid fa-warehouse" aria-hidden="true"></i> Warehouse</a></p>
     <p class="footer-copy">© 2026 All rights reserved.</p>
   </footer>
 
-  <button class="back-to-top" id="backToTop" aria-label="Back to top"><i class="fa-solid fa-arrow-up"></i></button>
+  <button class="back-to-top" id="backToTop" type="button" aria-label="Back to top"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
 
   <script src="js/main.js"></script>
 </body>
